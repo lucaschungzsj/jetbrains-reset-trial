@@ -26,25 +26,37 @@ if [ "$1" = "--launch-agent" ]; then
   COMMAND_PRE=("${PROCESS[@]/#/MacOS/}")
 
   # Kill all Intellij applications
-  kill -9 `ps aux | egrep $(IFS=$'|'; echo "${COMMAND_PRE[*]}") | awk '{print $2}'`
+  PIDS=$(ps aux | egrep $(IFS=$'|'; echo "${COMMAND_PRE[*]}") | awk '{print $2}')
+  if [ ! -z "$PIDS" ]; then
+    kill -9 $PIDS 2>/dev/null || true
+  fi
 fi
 
 # Reset Intellij evaluation
-#for product in IntelliJIdea WebStorm DataGrip PhpStorm CLion PyCharm GoLand RubyMine Rider; do
-for product in Rider; do
+for product in IntelliJIdea WebStorm DataGrip PhpStorm CLion PyCharm GoLand RubyMine Rider; do
+
+  # Check if directory exists before running
+  product_dir="$HOME/Library/Application\ Support/JetBrains/$product*"
+  if ! compgen -G "$product_dir" > /dev/null; then
+    # echo "Skipping $product - directory not found"
+    continue
+  fi
+
+  # This will expand the wildcard to actual path
+  product_dir=$(echo $product_dir)
+
   echo "Resetting trial period for $product"
 
-#  echo "removing evaluation key..."
-#  rm -rf ~/Library/Preferences/$product*/eval
+  echo "removing evaluation key..."
+  # Check if eval directory exists and remove key files
+  rm -rf "$product_dir"/evel/*.key
 
-  # Above path not working on latest version. Fixed below
-  rm -rf ~/Library/Application\ Support/JetBrains/$product*/eval/*.key
-
-#  echo "removing all evlsprt properties in options.xml..."
-#  sed -i '' '/evlsprt/d' ~/Library/Preferences/$product*/options/other.xml
-
-  # Above path not working on latest version. Fixed below
-  sed -i '' '/evlsprt/d' ~/Library/Application\ Support/JetBrains/$product*/options/other.xml
+  echo "removing all evlsprt properties in options.xml..."
+  # Check if other.xml exists before attempting to modify it
+  other_xml_path="$product_dir/options/other.xml"
+  if [ -f "$other_xml_path" ]; then
+    sed -i '' '/evlsprt/d' "$other_xml_path"
+  fi
 
   echo
 done

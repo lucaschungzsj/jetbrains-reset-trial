@@ -4,16 +4,14 @@
     <dict>
         <key>Label</key>
         <string>com.jetbrains.reset</string>
-		<key>ProgramArguments</key>
-		<array>
-  		  <string>/bin/sh</string>
-  		  <string>-c</string>
-  		  <string>exec $HOME/Scripts/jetbrains-reset.sh --launch-agent</string>
-	    </array>
-		<key>StartCalendarInterval</key> 
-		<dict> 
-		    <key>Day</key> 
-		    <integer>1</integer> 
-		</dict>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/bin/sh</string>
+            <string>-c</string>
+            <string>exec $HOME/Scripts/jetbrains-reset.sh --launch-agent</string>
+        </array>
+        <!-- 设置执行间隔时间（单位：秒），当前为2592000秒（30天） -->
+        <key>StartInterval</key>
+        <integer>2592000</integer>
     </dict>
 </plist>
